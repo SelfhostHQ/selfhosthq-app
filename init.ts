@@ -1,5 +1,6 @@
 import {} from 'bun'
-import { prismaClient } from 'prisma/prisma.client'
+import prismaClient from 'prisma/prisma.server'
+import bcrypt from 'bcrypt'
 const readInput = async (cmd?: string, required?: boolean) => {
   if (cmd) process.stdout.write(cmd)
   for await (const line of console) {
@@ -19,7 +20,7 @@ const name = await readInput('Name: ', true)
 const email = await readInput('Email: ', true)
 const password = await readInput('Password: ', true)
 
-const hashedPassword = await Bun.password.hash(password!)
+const hashedPassword = bcrypt.hashSync(password!, 10)
 
 //create a user
 await prismaClient.users.create({
