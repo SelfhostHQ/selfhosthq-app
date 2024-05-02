@@ -1,7 +1,19 @@
-import { ActionFunctionArgs, json, redirect } from '@remix-run/node'
-import { Form, useActionData, useNavigation } from '@remix-run/react'
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  json,
+  redirect,
+} from '@remix-run/node'
+import { Form, MetaFunction, useNavigation } from '@remix-run/react'
 import prismaClient from 'prisma/prisma.server'
 import { Button, TextInputField } from '~/components'
+import { getClientIPAddress } from 'remix-utils/get-client-ip-address'
+import UAParser from 'ua-parser-js'
+import { sessionCookie } from '~/entry.server'
+
+export const meta: MetaFunction = () => {
+  return [{ title: 'SelfhostHQ Login' }]
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   const bcrypt = await import('bcrypt')
@@ -32,15 +44,68 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ errors: [{ msg: 'Incorrect password. Please try again' }] })
   }
 
+  const parser = new UAParser(request.headers.get('user-agent') || '')
+  const parserResults = parser.getResult()
+  //get client location
+  const getLocationData = await fetch(
+    `https://ipapi.co/${getClientIPAddress(request)}/json/`
+  )
+  const locationData = (await getLocationData.json()) as {
+    city: string
+    region: string
+    country: string
+  }
+
   //setup session and redirect
 
-  return redirect('/')
+  const newSession = await prismaClient.sessions.create({
+    data: {
+      userId: user.id,
+      browserName: parserResults.browser.name,
+      deviceType: parserResults.device.vendor,
+      os: parserResults.os.name,
+      ipAddress: getClientIPAddress(request),
+      location: `${locationData.city || ''} ${locationData.region || ''} ${
+        locationData.country || ''
+      }`,
+    },
+  })
+
+  //set this session as a http only cookie on the header
+
+  const cookieHeader = request.headers.get('Cookie')
+  const cookie = (await sessionCookie.parse(cookieHeader)) || {}
+  cookie.sessionId = newSession.id
+
+  const { searchParams } = new URL(request.url)
+  const returnUrl = searchParams.get('return')
+  return redirect(returnUrl || '/', {
+    headers: {
+      'Set-Cookie': await sessionCookie.serialize(cookie),
+    },
+  })
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const cookieHeader = request.headers.get('Cookie')
+  const cookie = (await sessionCookie.parse(cookieHeader)) || {}
+  const sessionId = cookie.sessionId
+  //check if session is active
+  if (sessionId) {
+    const session = await prismaClient.sessions.findFirst({
+      where: { id: sessionId },
+    })
+    if (session && session.isActive) {
+      //redirect to homepage
+      return redirect('/')
+    }
+  }
+  return json({})
 }
 
 export default function LoginPage() {
   const navigation = useNavigation()
-  const data = useActionData<typeof action>()
-  console.log('actiond ata:', data)
+
   return (
     <div className=" min-h-screen flex align-middle justify-center bg-[#FFFAE1]">
       <div className=" px-6 py-12 lg:px-8 bg-white m-auto rounded-2xl">

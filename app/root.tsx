@@ -1,11 +1,26 @@
 import {
   Links,
   Meta,
+  MetaFunction,
   Outlet,
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react'
 import './styles.css'
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: 'SelfhostHQ' },
+    {
+      property: 'og:title',
+      content: 'SelfhostHQ',
+    },
+    {
+      name: 'description',
+      content: 'Admin panel for SelfhostHQ',
+    },
+  ]
+}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
