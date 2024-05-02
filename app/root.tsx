@@ -17,7 +17,7 @@ export const meta: MetaFunction = () => {
     },
     {
       name: 'description',
-      content: 'Admin panel for SelfhostHQ',
+      content: 'Backend app to manage my server',
     },
   ]
 }

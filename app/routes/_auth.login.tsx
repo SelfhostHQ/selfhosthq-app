@@ -143,6 +143,7 @@ export default function LoginPage() {
             <Button
               label="Login"
               type="submit"
+              fullWidth
               loading={navigation.state == 'submitting'}
             />
           </Form>

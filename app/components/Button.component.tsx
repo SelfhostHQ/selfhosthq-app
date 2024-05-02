@@ -5,11 +5,12 @@ export function Button(props: {
   type?: 'submit' | 'reset' | 'button'
   loading?: boolean
   disabled?: boolean
+  fullWidth?: boolean
 }) {
   return (
     <button
       type={props.type || 'button'}
-      className=" relative"
+      className={`relative ${props.fullWidth ? 'w-full' : ''}`}
       disabled={props.disabled || props.loading}
     >
       {props.loading ? (

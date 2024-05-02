@@ -14,19 +14,28 @@
   font-variation-settings: 'slnt' 0;
 }
 
+h1 {
+  @apply text-4xl font-bold;
+  font-weight: 800;
+}
+
 h2 {
   @apply text-3xl font-bold;
   font-weight: 600;
 }
 
+h3 {
+  @apply text-2xl font-bold;
+  font-weight: 400;
+}
+
 button {
   @apply bg-[var(--color-primary)] text-white hover:bg-white hover:border-[var(--color-primary)] border-2 border-transparent hover:border-solid hover:text-black;
-  @apply transition-all w-full;
+  @apply transition-all;
   @apply rounded-md  px-3 py-1.5 text-sm font-bold;
 }
 
 a {
-  @apply text-[var(--color-primary)];
 }
 
 /* Spinner code */

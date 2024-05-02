@@ -1,14 +1,14 @@
 import { HTMLInputAutoCompleteAttribute } from 'react'
 
-export function TextInputField(props: {
+export function TextAreaInputField(props: {
   label: string
   id: string
   name: string
-  type?: 'email' | 'text' | 'password' | 'textarea'
+  rows?: number
   placeholder?: string
-  disabled?: boolean
   autocomplete?: HTMLInputAutoCompleteAttribute
   required?: boolean
+  disabled?: boolean
   action?: {
     label: string
     link: string
@@ -33,21 +33,19 @@ export function TextInputField(props: {
         ) : null}
       </div>
 
-      <div className="my-2">
-        <input
+      <div className="mt-2">
+        <textarea
           id={props.id}
           placeholder={props.placeholder}
           name={props.name}
+          rows={props.rows || 2}
           disabled={props.disabled}
-          type={props.type || 'text'}
           autoComplete={props.autocomplete || 'off'}
           required={props.required}
           className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
         />
       </div>
-      {props.helpText ? (
-        <span className=" text-sm text-gray-500 ">{props.helpText}</span>
-      ) : null}
+      {props.helpText ? <span>{props.helpText}</span> : null}
     </div>
   )
 }
