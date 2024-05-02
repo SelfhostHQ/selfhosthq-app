@@ -123,7 +123,7 @@ async function handleBrowserRequest(
       }
     }
 
-    if (!isLoggedIn) {
+    if (!isLoggedIn && request.url.indexOf('/forgot-password') == -1) {
       //redirect to login page
       return redirect(`/login?return=${request.url}`)
     }
