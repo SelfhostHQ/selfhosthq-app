@@ -53,7 +53,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const locationData = (await getLocationData.json()) as {
     city: string
     region: string
-    country: string
+    country_name: string
   }
 
   //setup session and redirect
@@ -66,7 +66,7 @@ export async function action({ request }: ActionFunctionArgs) {
       os: parserResults.os.name,
       ipAddress: getClientIPAddress(request),
       location: `${locationData.city || ''} ${locationData.region || ''} ${
-        locationData.country || ''
+        locationData.country_name || ''
       }`,
     },
   })
