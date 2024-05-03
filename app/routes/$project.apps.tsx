@@ -1,16 +1,29 @@
 import { LoaderFunctionArgs, json } from '@remix-run/node'
-import { isRouteErrorResponse, useRouteError } from '@remix-run/react'
+import {
+  isRouteErrorResponse,
+  useLoaderData,
+  useRouteError,
+} from '@remix-run/react'
+import prismaClient from 'prisma/prisma.server'
+import { Page } from '~/components/Page.component'
 import { PROJECT_PERMISSIONS } from '~/types'
-import { checkProjectPermissions } from '~/utils/checkProjectPermissions.util'
+import { checkProjectPermissionsAndReturnProjectId } from '~/utils/checkProjectPermissionsAndReturnProjectId.util'
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const projectHandle = params.project
   if (!projectHandle) throw Error('Project not found')
-  await checkProjectPermissions(request, projectHandle, [
-    PROJECT_PERMISSIONS.READ_ALL_APPS,
-  ])
+  const projectId = await checkProjectPermissionsAndReturnProjectId(
+    request,
+    projectHandle,
+    [PROJECT_PERMISSIONS.READ_ALL_APPS]
+  )
 
-  return json({})
+  const apps = await prismaClient.apps.findMany({
+    where: {
+      projectId,
+    },
+  })
+  return json({ apps })
 }
 
 export function ErrorBoundary() {
@@ -24,5 +37,12 @@ export function ErrorBoundary() {
   return 'Oops! Something went wrong. Please try again'
 }
 export default function Apps() {
-  return <div>This is where we need to show all apps for this project</div>
+  const { apps } = useLoaderData<typeof loader>()
+  return (
+    <Page title="Apps">
+      {apps.length == 0 ? (
+        <div className=" my-4">No apps found under this project</div>
+      ) : null}
+    </Page>
+  )
 }

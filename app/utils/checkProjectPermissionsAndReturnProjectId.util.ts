@@ -3,7 +3,7 @@ import { getUser } from './getUser.util'
 import { PROJECT_PERMISSIONS } from '~/types'
 import { ERROR_CODES } from '~/constants'
 
-export async function checkProjectPermissions(
+export async function checkProjectPermissionsAndReturnProjectId(
   request: Request,
   projectHandle: string,
   permissions: string[]
@@ -34,11 +34,16 @@ export async function checkProjectPermissions(
     throw new Response('Insufficient permissions to view this page', {
       status: ERROR_CODES.NOT_FOUND,
     })
-  if (availablePermissions[0] == PROJECT_PERMISSIONS.FULL_ACCESS) return true
+  if (availablePermissions[0] == PROJECT_PERMISSIONS.FULL_ACCESS)
+    return project.id
   for (let index = 0; index < permissions.length; index++) {
     const permission = permissions[index]
     if (availablePermissions?.indexOf(permission) != -1) allowAccess = true
   }
+  if (!allowAccess)
+    throw new Response("You don't have access to view apps for this project", {
+      status: ERROR_CODES.NOT_FOUND,
+    })
 
-  return allowAccess
+  return project.id
 }
