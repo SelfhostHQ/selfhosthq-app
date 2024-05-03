@@ -29,7 +29,7 @@ h3 {
   font-weight: 400;
 }
 
-button {
+button.styled {
   @apply bg-[var(--color-primary)] text-white hover:bg-white hover:border-[var(--color-primary)] border-2 border-transparent hover:border-solid hover:text-black;
   @apply transition-all;
   @apply rounded-md  px-3 py-1.5 text-sm font-bold;

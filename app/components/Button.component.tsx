@@ -10,7 +10,7 @@ export function Button(props: {
   return (
     <button
       type={props.type || 'button'}
-      className={`relative ${props.fullWidth ? 'w-full' : ''}`}
+      className={` styled relative ${props.fullWidth ? 'w-full' : ''}`}
       disabled={props.disabled || props.loading}
     >
       {props.loading ? (
