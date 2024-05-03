@@ -35,21 +35,45 @@ model Sessions {
 }
 
 model Projects {
-  id          String          @unique @default(uuid())
-  name        String
-  description String?
-  handle      String          @unique
-  accesses    ProjectAccess[]
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  id                 String                       @unique @default(uuid())
+  name               String
+  description        String?
+  handle             String                       @unique
+  accesses           ProjectAccess[]
+  apps               Apps[]
+  githubAccessTokens GitHubPersonalAccessTokens[]
+  createdAt          DateTime                     @default(now())
+  updatedAt          DateTime                     @updatedAt
 }
 
 model ProjectAccess {
-  id        String   @unique @default(uuid())
-  userId    String
-  projectId String
-  project   Projects @relation(fields: [projectId], references: [id])
-  role      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @unique @default(uuid())
+  userId      String
+  projectId   String
+  project     Projects @relation(fields: [projectId], references: [id])
+  role        String
+  permissions String //comma seperated permissions
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GitHubPersonalAccessTokens {
+  id          String   @unique @default(uuid())
+  name        String
+  accessToken String
+  projectId   String
+  project     Projects @relation(fields: [projectId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Apps {
+  id             String   @unique @default(uuid())
+  name           String
+  projectId      String
+  project        Projects @relation(fields: [projectId], references: [id])
+  deployType     String // this would be an enum PROJECT_DEPLOY_TYPE
+  deployAccessId String // this would contain the id of the token we have stored in out db
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
